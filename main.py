@@ -86,10 +86,33 @@ def lab3():
         y_array += [element[3]]
         x_array += [element[0]]
 
+    new_data = []
 
+    for i in range(int(len(sort_group_data)/10)):
+        new_data.append([
+                         float(avg_carat[random.randint(0,4)][0]),
+                         avg_cut[random.randint(0,4)][0],
+                         avg_color[random.randint(0,4)][0],
+                         avg_clarity[random.randint(0,4)][0],
+                         avg_depth[random.randint(0,4)][0],
+                         avg_table[random.randint(0,4)][0],
+                         float(avg_price[random.randint(0,4)][0]),
+                         avg_x[random.randint(0,4)][0],
+                         avg_y[random.randint(0,4)][0],
+                         avg_z[random.randint(0,4)][0]
+                         ])
 
+    new_data = functions.group_by_array_column(new_data,0)
+    new_data += sort_group_data
+    new_data = sorted(new_data, key=lambda x: float(x[0]))
+    print(new_data)
+    for element in new_data:
+        new_y_array += [element[3]]
+        new_x_array += [element[0]]
 
     plt.plot(x_array, y_array, color='blue', linestyle='solid', label='исходные данные')
+    plt.plot(new_x_array, new_y_array, color='red', linestyle='solid', label='новые данные')
+
 
 
     plt.legend(loc='upper right')

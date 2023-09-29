@@ -72,6 +72,27 @@ def group_by_column(file_path, column_index):
 
     return result
 
+def group_by_array_column(array,column_index):
+    groups = {}
+    result = []
+
+    for row in array:
+        column_value = row[column_index]
+        if column_value not in groups:
+            groups[column_value] = []
+        groups[column_value].append(row)
+
+    for key, value in groups.items():
+        group_element = ""
+        costs = []
+        for row in value:
+            group_element = row[column_index]
+            costs.append(float(row[6]))
+
+        result.append([group_element, min(costs), max(costs), int(sum(costs) / len(value)), len(value)])
+
+    return result
+
 
 def array_to_html(arr):
     html = '<table>'
