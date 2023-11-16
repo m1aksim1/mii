@@ -72,6 +72,11 @@ def group_by_column(file_path, column_index):
 
     return result
 
+def get_avg_value(csv, col, param):
+    group_data = group_by_column(csv, col)
+    sort_group_data_count = sort_array(group_data, param)
+    slice_data = sort_group_data_count[len(sort_group_data_count) - 5:len(sort_group_data_count):1]
+    return slice_data
 def group_by_array_column(array,column_index):
     groups = {}
     result = []

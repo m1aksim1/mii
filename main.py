@@ -51,16 +51,16 @@ def lab3():
     group_data = functions.group_by_column("Diamonds Prices2022.csv",1)
     sort_group_data = functions.sort_array(group_data, 0)
 
-    avg_carat = get_avg_value("Diamonds Prices2022.csv", 1, 4)
-    avg_cut = get_avg_value("Diamonds Prices2022.csv",2,4)
-    avg_color = get_avg_value("Diamonds Prices2022.csv",3,4)
-    avg_clarity = get_avg_value("Diamonds Prices2022.csv", 4, 4)
-    avg_depth = get_avg_value("Diamonds Prices2022.csv", 5, 4)
-    avg_table = get_avg_value("Diamonds Prices2022.csv", 6, 4)
-    avg_price = get_avg_value("Diamonds Prices2022.csv", 7, 4)
-    avg_x = get_avg_value("Diamonds Prices2022.csv", 8, 4)
-    avg_y = get_avg_value("Diamonds Prices2022.csv", 9, 4)
-    avg_z = get_avg_value("Diamonds Prices2022.csv", 10, 4)
+    avg_carat = functions.get_avg_value("Diamonds Prices2022.csv", 1, 4)
+    avg_cut = functions.get_avg_value("Diamonds Prices2022.csv",2,4)
+    avg_color = functions.get_avg_value("Diamonds Prices2022.csv",3,4)
+    avg_clarity = functions.get_avg_value("Diamonds Prices2022.csv", 4, 4)
+    avg_depth = functions.get_avg_value("Diamonds Prices2022.csv", 5, 4)
+    avg_table = functions.get_avg_value("Diamonds Prices2022.csv", 6, 4)
+    avg_price = functions.get_avg_value("Diamonds Prices2022.csv", 7, 4)
+    avg_x = functions.get_avg_value("Diamonds Prices2022.csv", 8, 4)
+    avg_y = functions.get_avg_value("Diamonds Prices2022.csv", 9, 4)
+    avg_z = functions.get_avg_value("Diamonds Prices2022.csv", 10, 4)
 
 
 
@@ -108,7 +108,7 @@ def lab3():
     print(new_data)
     for element in new_data:
         new_y_array += [element[3]]
-        new_x_array += [element[0]]
+        new_x_array += [str(element[0])]
 
     plt.plot(x_array, y_array, color='blue', linestyle='solid', label='исходные данные')
     plt.plot(new_x_array, new_y_array, color='red', linestyle='solid', label='новые данные')
@@ -124,12 +124,11 @@ def lab3():
     pic1 = os.path.join(app.config['UPLOAD_FOLDER'], 'trigan.png')
     return render_template("lab3.html", user_image = pic1)
 
+@app.route("/lab4", methods=['GET', 'POST'])
+def lab4():
+    return 
 
-def get_avg_value(csv, col, param):
-    group_data = functions.group_by_column(csv, col)
-    sort_group_data_count = functions.sort_array(group_data, param)
-    slice_data = sort_group_data_count[len(sort_group_data_count) - 5:len(sort_group_data_count):1]
-    return slice_data
+
 
 if __name__ == "__main__":
     app.run(debug=False)
