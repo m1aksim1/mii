@@ -4,8 +4,10 @@ import random
 from flask import Flask, redirect, url_for, request, render_template
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import pandas as pd
 import math
 
+import BloomFilter
 import functions
 
 app = Flask(__name__)
@@ -126,8 +128,46 @@ def lab3():
 
 @app.route("/lab4", methods=['GET', 'POST'])
 def lab4():
-    return 
+    answer = ""
+    req = request.args
+    data1 = pd.read_csv('Diamonds Prices2022.csv', sep=',')
+    key_words = functions.get_key_words(data1)
+    bf1 = BloomFilter.BloomFilter(len(key_words), 0.01)
+    for i in range(len(key_words)):
+        bf1.add(str(key_words[i]))
+    if (bf1.check(req['word'])):
+        answer += '<h1>По ключевому слову найдены обьекты в Diamonds Prices2022</h1>' + functions.get_data_search(data1, req['word'])
+    else:
+        answer += '<h1>По ключевому слову не найдены обьекты в Diamonds Prices2022</h1>'
+    print("hello");
+    data2 = pd.read_csv('diabetes.csv', sep=',')
+    key_words = functions.get_key_words(data2)
+    bf2 = BloomFilter.BloomFilter(len(key_words), 0.01)
+    for i in range(len(key_words)):
+        bf2.add(str(key_words[i]))
+    if (bf2.check(req['word'])):
+        answer += '<h1>По ключевому слову найдены обьекты в diabetes</h1>'  + functions.get_data_search(data2, req['word'])
+    else:
+        answer += '<h1>По ключевому слову не найдены обьекты в diabetes</h1>'
 
+    data3 = pd.read_csv('healthcare-dataset-stroke-data.csv', sep=',')
+    key_words = functions.get_key_words(data3)
+    bf3 = BloomFilter.BloomFilter(len(key_words), 0.01)
+    for i in range(len(key_words)):
+        bf3.add(str(key_words[i]))
+    if (bf3.check(req['word'])):
+        answer += '<h1>По ключевому слову найдены обьекты в healthcare-dataset-stroke-data</h1>' + functions.get_data_search(data3, req['word'])
+    else:
+        answer += '<h1>По ключевому слову не найдены обьекты в healthcare-dataset-stroke-data</h1>' \
+
+    print(answer)
+    return answer
+@app.route("/test", methods=['GET', 'POST'])
+def test():
+    bf1 = BloomFilter.BloomFilter(10, 0.01)
+    bf1.add("hello")
+    print(bf1.check("hello"));
+    return
 
 
 if __name__ == "__main__":

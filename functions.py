@@ -131,3 +131,27 @@ def get_type(string):
     except ValueError:
         pass
     return "string"
+
+
+def get_key_words(data):    #вовращает все существующие ключевые слова по категории поиска
+    keys=[]
+    for col in data.columns:
+        keys+=data[col].unique().tolist()
+    return keys
+
+class_list_for_bloom=["carat","cut","color","clarity","depth","table","price","x","y","z",
+            "gender","ever_married","work_type","Residence_type","smoking_status"]
+def get_data_search(data,word): # возвращает найденные значения по ключевому слову
+    for col in data.columns:
+        print(col)
+        if(col in class_list_for_bloom):
+            row=data.loc[data[col]==word]
+            if(len(row)>0):
+                return row.to_html()
+        else:
+            try:
+                row=data.loc[data[col]==int(word)]
+                if(len(row)>0):
+                    return row.to_html()
+            except:
+                continue
