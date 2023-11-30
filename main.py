@@ -5,7 +5,12 @@ from flask import Flask, redirect, url_for, request, render_template
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
-import math
+
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+
+
+
 
 import BloomFilter
 import functions
@@ -139,7 +144,6 @@ def lab4():
         answer += '<h1>По ключевому слову найдены обьекты в Diamonds Prices2022</h1>' + functions.get_data_search(data1, req['word'])
     else:
         answer += '<h1>По ключевому слову не найдены обьекты в Diamonds Prices2022</h1>'
-    print("hello");
     data2 = pd.read_csv('diabetes.csv', sep=',')
     key_words = functions.get_key_words(data2)
     bf2 = BloomFilter.BloomFilter(len(key_words), 0.01)
@@ -162,6 +166,77 @@ def lab4():
 
     print(answer)
     return answer
+
+@app.route("/lab5", methods=['GET', 'POST'])
+def lab5():
+    data = pd.read_csv('Diamonds Prices2022.csv')
+    train, check = functions.lab5(data, 99)
+    plt.scatter(train[0], train[1], label='Real price')  # реальные данные
+    plt.scatter(train[0], train[2], label='Pred price')  # данные полученные с помощью парной линейной регрессии
+    plt.legend(fontsize=8)
+    plt.savefig("static/pics/linearRegresTrain.jpg")
+    plt.close()
+
+    # оставшиеся данные
+    plt.scatter(check[0], check[1], label='Real price')  # реальные данные
+    plt.scatter(check[0], check[2], label='Pred price')  # данные полученные с помощью парной линейной регрессии
+    plt.legend(fontsize=8)
+    plt.savefig("static/pics/linnearRegresCheck.jpg")
+    plt.close()
+
+
+    table = "R^2=" + str(check[3]) + pd.concat([check[0], check[1], check[2]], axis=1).to_html();
+
+    picFolder = os.path.join('static', 'pics')
+    app.config['UPLOAD_FOLDER'] = picFolder
+    pic1 = os.path.join(app.config['UPLOAD_FOLDER'], 'linearRegresTrain.jpg')
+    pic2 = os.path.join(app.config['UPLOAD_FOLDER'], 'linnearRegresCheck.jpg')
+    return render_template("lab5.html", user_image1=pic1, user_image2=pic2, table = table)
+
+@app.route("/lab6", methods=['GET', 'POST'])
+def lab6():
+    date = pd.read_csv("Diamonds Prices2022.csv")
+    print(date['price'])
+    date.head()
+    x = date.loc[:, 'carat':'cut']
+    y = date['price']
+    dictionary = {'Fair': 1,
+                  'Good': 2,
+                  'Very Good': 3,
+                  'Ideal': 4,
+                  'Premium': 5}
+
+    # Замена значений в столбце 'cut' с помощью словаря
+    x['cut'] = x['cut'].replace(dictionary)
+
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1)
+
+    clf = DecisionTreeClassifier()
+    clf = clf.fit(x_train, y_train)
+    y_pred = clf.predict(x_test)
+    print(format(clf.score(x_train, y_train)))
+    print(format(clf.score(x_test, y_test)))
+    df = pd.DataFrame(data=y_pred,columns=['predict'])
+    x_test['predict'] = y_pred
+    x_test['true_price'] = y_test
+
+    flipped_dict = {value: key for key, value in dictionary.items()}
+    x_test['cut'] = x_test['cut'].replace(flipped_dict)
+
+    x_test = x_test.sort_values(by=['true_price'], key=lambda x: x_test['true_price'])
+    l = len(x_test)
+
+    plt.plot(range(l), x_test['predict'], color='red', linestyle='solid', label='сгенерированные данные')
+    plt.plot(range(l), x_test['true_price'], color='blue', linestyle='solid', label='исходные данные')
+    plt.show()
+
+    return x_test.to_html()
+
+
+
+
+
+
 @app.route("/test", methods=['GET', 'POST'])
 def test():
     bf1 = BloomFilter.BloomFilter(10, 0.01)

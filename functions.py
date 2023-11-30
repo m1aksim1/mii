@@ -143,7 +143,6 @@ class_list_for_bloom=["carat","cut","color","clarity","depth","table","price","x
             "gender","ever_married","work_type","Residence_type","smoking_status"]
 def get_data_search(data,word): # возвращает найденные значения по ключевому слову
     for col in data.columns:
-        print(col)
         if(col in class_list_for_bloom):
             row=data.loc[data[col]==word]
             if(len(row)>0):
@@ -155,3 +154,27 @@ def get_data_search(data,word): # возвращает найденные зна
                     return row.to_html()
             except:
                 continue
+
+def lab5(data,percent):
+    data = data.sample(frac = 1)# распределяем данные случайным образом
+    n = len(data)*percent//100
+    x = data['carat'][0:n]
+    y = data['price'][0:n]
+
+    avg_x = x.sum()/n
+    avg_y = y.sum()/n
+    avg_xy = sum(y*x)/n
+    avg_xin2 = sum(x**2)/n
+    betha2 = (avg_xy-avg_x*avg_y)/(avg_xin2-avg_x**2)
+    betha1 = avg_y-betha2*avg_x
+    pred_y = x*betha2+betha1
+
+    check_x = data['carat'][n:len(data)]
+    check_y = data['price'][n:len(data)]
+
+    pred_check_y = check_x*betha2+betha1
+    pred_check_y.name = 'pred price'
+    sst = sum((check_y-avg_y)**2)
+    sse = sum((check_y-check_x*betha2-betha1)**2)
+    R = 1-sse/sst
+    return [x, y,pred_y] , [check_x,check_y,pred_check_y,R]
