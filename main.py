@@ -14,6 +14,7 @@ from sklearn.tree import DecisionTreeClassifier
 
 import BloomFilter
 import functions
+from DecisionTree import DecisionTree
 
 app = Flask(__name__)
 
@@ -196,34 +197,46 @@ def lab5():
 @app.route("/lab6", methods=['GET', 'POST'])
 def lab6():
     date = pd.read_csv("Diamonds Prices2022.csv")
-    print(date['price'])
     date.head()
-    x = date.loc[:, 'carat':'cut']
+    x = date[['cut', 'clarity']]
+    newx = x.loc[:,'cut':'clarity']
     y = date['price']
-    dictionary = {'Fair': 1,
+    dictClarity = {'SI2': 1,
+                  'SI1': 2,
+                  'VS1': 3,
+                  'VS2': 4,
+                  'Premium': 5,
+                  'VVS2': 6,
+                  'VVS1' : 7,
+                  'I1' : 8,
+                  'IF' : 9}
+    dictCut = {'Fair': 1,
                   'Good': 2,
                   'Very Good': 3,
                   'Ideal': 4,
                   'Premium': 5}
 
     # Замена значений в столбце 'cut' с помощью словаря
-    x['cut'] = x['cut'].replace(dictionary)
+    newx['cut'] = newx['cut'].replace(dictCut)
+    newx['clarity'] = newx['clarity'].replace(dictClarity)
 
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1)
+    x_train, x_test, y_train, y_test = train_test_split(newx, y, test_size=0.3, random_state=1)
 
-    clf = DecisionTreeClassifier()
-    clf = clf.fit(x_train, y_train)
-    y_pred = clf.predict(x_test)
-    print(format(clf.score(x_train, y_train)))
-    print(format(clf.score(x_test, y_test)))
+    DT = DecisionTree(x_train, y_train)
+    y_pred = DT.predict(x_test)
+
+
     df = pd.DataFrame(data=y_pred,columns=['predict'])
     x_test['predict'] = y_pred
     x_test['true_price'] = y_test
 
-    flipped_dict = {value: key for key, value in dictionary.items()}
+    flipped_dict = {value: key for key, value in dictCut.items()}
     x_test['cut'] = x_test['cut'].replace(flipped_dict)
+    flipped_dict = {value: key for key, value in dictClarity.items()}
+    x_test['clarity'] = x_test['clarity'].replace(flipped_dict)
 
-    x_test = x_test.sort_values(by=['true_price'], key=lambda x: x_test['true_price'])
+
+    x_test = x_test.sort_values(by=['true_price'], key=lambda newx: x_test['true_price'])
     l = len(x_test)
 
     plt.plot(range(l), x_test['predict'], color='red', linestyle='solid', label='сгенерированные данные')
@@ -241,7 +254,7 @@ def lab6():
 def test():
     bf1 = BloomFilter.BloomFilter(10, 0.01)
     bf1.add("hello")
-    print(bf1.check("hello"));
+    print(bf1.check("hello"))
     return
 
 
