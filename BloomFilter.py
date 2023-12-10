@@ -1,4 +1,3 @@
-import mmh3
 import math
 from bitarray import bitarray
 
@@ -11,12 +10,12 @@ class BloomFilter: #реализация фильтра блуума
 
     def add(self, item):
         for i in range(self.hash_count):
-            digest = mmh3.hash(item, i) % self.size
+            digest = hash(item+str(i)) % self.size
             self.bit_array[digest] = 1
 
     def check(self, item):
         for i in range(self.hash_count):
-            digest = mmh3.hash(item, i) % self.size
+            digest = hash(item+str(i)) % self.size
             if self.bit_array[digest] == 0:
                 return False
         return True

@@ -1,10 +1,12 @@
 import os.path
 import random
 
+import numpy as np
 from flask import Flask, redirect, url_for, request, render_template
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
+from sklearn.cluster import DBSCAN
 
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
@@ -14,6 +16,7 @@ from sklearn.tree import DecisionTreeClassifier
 
 import BloomFilter
 import functions
+import CustomClustering
 from DecisionTree import DecisionTree
 
 app = Flask(__name__)
@@ -237,16 +240,45 @@ def lab6():
 
 
     x_test = x_test.sort_values(by=['true_price'], key=lambda newx: x_test['true_price'])
+    realPrice = x_test['true_price']
+    x_test = x_test.sort_values(by=['predict'], key=lambda newx: x_test['predict'])
+
     l = len(x_test)
 
     plt.plot(range(l), x_test['predict'], color='red', linestyle='solid', label='сгенерированные данные')
-    plt.plot(range(l), x_test['true_price'], color='blue', linestyle='solid', label='исходные данные')
+    plt.plot(range(l), realPrice, color='blue', linestyle='solid', label='исходные данные')
     plt.show()
 
     return x_test.to_html()
+@app.route("/lab7", methods=['GET', 'POST'])
+def lab7():
+    date = pd.read_csv("Diamonds Prices2022_10.csv")
+    date = date.sample(frac=1)
+    newData = pd.DataFrame()
+    newData["price"] = date['price']
+    newData["carat"] = date['carat']
 
+    # Генерируем случайные данные для примера
+    np.random.seed(0)
+    X = newData.to_numpy()
 
+    # Визуализируем кластеры
+    custom_dbscan = CustomClustering.DBSCAN(3, 5)
+    custom_clusters = custom_dbscan.fit(X)
+    print(np.unique(custom_clusters))
+    print("count clusters: " + str(len(np.unique(custom_clusters))))
+    # Визуализируем кластеры
 
+    dpi = 80
+    plt.figure(dpi=dpi, figsize=(1000 / dpi, 400 / dpi))
+    mpl.rcParams.update({'font.size': 6})
+    plt.axis([0, 20000, 0, 5])
+
+    plt.scatter(X[:, 0], X[:, 1], c=custom_clusters, cmap='viridis')
+    plt.xlabel('Feature 1')
+    plt.ylabel('Feature 2')
+    plt.title('Custom Clustering')
+    plt.show()
 
 
 
